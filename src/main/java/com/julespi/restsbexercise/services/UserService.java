@@ -11,8 +11,7 @@ public class UserService {
     @Autowired
     private UserDaoImp userDaoImp;
 
-    public void adduser(User user){
-        System.out.println("servicio -- "+user.getName());
-        userDaoImp.prueba2(user);
+    public User adduser(User user){
+        return userDaoImp.save(user);
     }
 }

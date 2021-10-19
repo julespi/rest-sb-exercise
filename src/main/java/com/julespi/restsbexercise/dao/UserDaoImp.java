@@ -6,8 +6,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class UserDaoImp extends GenericDao<User> {
 
-    private void prueba(){
-        this.save(new User());
-    }
-
 }

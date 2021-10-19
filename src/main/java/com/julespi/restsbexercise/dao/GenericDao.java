@@ -1,15 +1,19 @@
 package com.julespi.restsbexercise.dao;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
-import com.julespi.restsbexercise.models.User;
 
+@Transactional
 public abstract class GenericDao<T>{
-    public T save(T t){
-        return t;
-    }
 
-    public void prueba2(User user){
-        System.out.println("generic Dao --"+user.getName());
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public T save(T t){
+        entityManager.persist(t);
+        return t;
     }
 
 }

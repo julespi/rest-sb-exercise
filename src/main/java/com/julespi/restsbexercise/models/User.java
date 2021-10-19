@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 @Entity
@@ -15,6 +16,7 @@ public class User {
     @Getter @Setter
     private Long id;
 
+    @NotBlank(message = "hola")
     @Getter @Setter
     private String name;
 
