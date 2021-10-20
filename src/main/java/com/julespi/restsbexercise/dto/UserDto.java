@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.Set;
 
 public class UserDto {
@@ -29,5 +30,9 @@ public class UserDto {
     private Boolean isActive;
 
     @Getter @Setter
-    private PhoneDto[] phones;
+    private ArrayList<PhoneDto> phones;
+
+    public UserDto() {
+        this.phones = new ArrayList<>();
+    }
 }

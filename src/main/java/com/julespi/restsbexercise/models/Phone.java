@@ -17,9 +17,11 @@ public class Phone { //Serializable??
     @Getter @Setter
     private String number;
 
+    @Column(name = "citycode")
     @Getter @Setter
     private String cityCode;
 
+    @Column(name = "countrycode")
     @Getter @Setter
     private String countryCode;
 

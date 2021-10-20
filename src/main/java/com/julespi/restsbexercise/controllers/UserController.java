@@ -35,11 +35,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "api/users", method = RequestMethod.POST)
-    //public ResponseEntity<User> createUsers(@Valid @RequestBody UserDto userDto){
-    public UserDto createUsers(@Valid @RequestBody UserDto userDto){
-        //User dbUser = uService.adduser(reqUser);
-        //return new ResponseEntity<>(dbUser, HttpStatus.CREATED);
-        return userDto;
+    public ResponseEntity<UserDto> createUsers(@Valid @RequestBody UserDto userDto){
+        UserDto returnUserDto = uService.addUser(userDto);
+        return new ResponseEntity<>(returnUserDto, HttpStatus.CREATED);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -53,6 +51,8 @@ public class UserController {
         });
         return errors;
     }
+
+
 
 
 }
