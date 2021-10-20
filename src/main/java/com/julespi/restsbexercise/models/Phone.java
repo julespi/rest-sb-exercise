@@ -6,11 +6,11 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "telephones")
-public class Telephone {
+@Table(name = "phones")
+public class Phone { //Serializable??
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter @Setter
     private Long id;
 
@@ -22,5 +22,10 @@ public class Telephone {
 
     @Getter @Setter
     private String countryCode;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    @Getter @Setter
+    private User user;
 
 }

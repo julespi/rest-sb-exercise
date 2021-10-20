@@ -1,5 +1,6 @@
 package com.julespi.restsbexercise.controllers;
 
+import com.julespi.restsbexercise.dto.UserDto;
 import com.julespi.restsbexercise.models.User;
 import com.julespi.restsbexercise.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,20 +35,12 @@ public class UserController {
     }
 
     @RequestMapping(value = "api/users", method = RequestMethod.POST)
-    public ResponseEntity<User> createUsers(@Valid @RequestBody User user){
-        User newUser = uService.adduser(user);
-        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+    //public ResponseEntity<User> createUsers(@Valid @RequestBody UserDto userDto){
+    public UserDto createUsers(@Valid @RequestBody UserDto userDto){
+        //User dbUser = uService.adduser(reqUser);
+        //return new ResponseEntity<>(dbUser, HttpStatus.CREATED);
+        return userDto;
     }
-
-    /*@ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    int handleConstraintViolationException(ConstraintViolationException e) {
-        List<String> details = new ArrayList<String>();
-        details.add(e.getMessage());
-        //return new ResponseEntity<>(details, HttpStatus.BAD_REQUEST);
-        return details.size();
-    }*/
-
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -56,7 +49,7 @@ public class UserController {
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            errors.put("message", errorMessage);
         });
         return errors;
     }

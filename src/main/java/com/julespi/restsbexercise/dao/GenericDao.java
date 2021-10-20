@@ -9,7 +9,7 @@ import javax.transaction.Transactional;
 public abstract class GenericDao<T>{
 
     @PersistenceContext
-    private EntityManager entityManager;
+    public EntityManager entityManager;
 
     public T save(T t){
         entityManager.persist(t);

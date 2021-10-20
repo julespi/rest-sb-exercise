@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 @Entity
@@ -12,28 +11,27 @@ import java.util.Set;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter @Setter
     private Long id;
 
-    @NotBlank(message = "hola")
     @Getter @Setter
     private String name;
 
+    @Column(unique = true)
     @Getter @Setter
     private String email;
 
     @Getter @Setter
     private String password;
 
+    //@Column(columnDefinition="bit default 0")
     @Getter @Setter
     private Boolean isActive;
 
-    @OneToMany(
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
     @Getter @Setter
-    private Set<Telephone> phones;
+    private Set<Phone> phones;
 
 }
