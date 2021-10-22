@@ -10,7 +10,7 @@ import java.util.Set;
 @Repository
 public class PhoneDaoImp extends GenericDao<Phone>  {
 
-    public ArrayList<Phone> saveAll(ArrayList<Phone> phones, User user){
+    public Set<Phone> saveAll(Set<Phone> phones, User user){
         for (Phone phone : phones) {
             phone.setUser(user);
             entityManager.persist(phone);

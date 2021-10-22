@@ -1,11 +1,7 @@
 package com.julespi.restsbexercise.dto;
 
-
-import com.julespi.restsbexercise.models.User;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.persistence.*;
 
 public class PhoneDto{
 

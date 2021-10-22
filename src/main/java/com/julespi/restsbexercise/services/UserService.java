@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -22,53 +25,53 @@ public class UserService {
 
     public UserDto addUser(UserDto userDto){
         User newUser = new User();
-        ArrayList<Phone> phones = new ArrayList();
 
-        mapUserDtoToUserAndPhones(userDto, newUser, phones);
+        mapUserDtoToUser(userDto, newUser);
+        newUser.setIsActive(true);
+
+        //Set<Phone> phones = new HashSet<Phone>(newUser.getPhones());
+        //newUser.setPhones(null);
 
         User dbUser = userDaoImp.save(newUser);
-        ArrayList<Phone> phonesDb = phoneDaoImp.saveAll(phones,dbUser);
 
+        //Set<Phone> phonesDb = phoneDaoImp.saveAll(phones,dbUser);
         UserDto newUserDto = new UserDto();
-        mapUserAndPhonesToUserDto(dbUser, phonesDb, newUserDto);
-
+        mapUserToUserDto(dbUser, newUserDto);
         return newUserDto;
     }
 
-    //user  ->   userDto
-    private void mapUserAndPhonesToUserDto(User dbUser, ArrayList<Phone> phonesDb, UserDto newUserDto) {
-        newUserDto.setName(dbUser.getName());
-        newUserDto.setEmail(dbUser.getEmail());
-        newUserDto.setPassword(dbUser.getPassword());
-        newUserDto.setId(dbUser.getId());
-        mapPhonesToPhonesDto(phonesDb,newUserDto.getPhones());
-    }
 
-    //phones --> phonesDto
-    private void mapPhonesToPhonesDto(ArrayList<Phone> phonesDb, ArrayList<PhoneDto> phonesDto) {
-        for (Phone phone : phonesDb) {
-            PhoneDto phoneDto = new PhoneDto();
-            phoneDto.setNumber(phone.getNumber());
-            phoneDto.setCitycode(phone.getCityCode());
-            phoneDto.setContrycode(phone.getCountryCode());
-            phoneDto.setId(phone.getId());
 
-            phonesDto.add(phoneDto);
-        }
-    }
-
-    //userDto  ->   user
-    private void mapUserDtoToUserAndPhones(UserDto userDto, User user, ArrayList<Phone> phones) {
+    //    ----------   NUEVO      ---------
+    private void mapUserDtoToUser(UserDto userDto, User user) {
+        // TODO id?
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
         user.setPassword(userDto.getPassword());
         user.setIsActive(userDto.getIsActive());
-
-        mapPhonesDtoToPhones(userDto.getPhones(),phones);
+        user.setCreated(userDto.getCreated());
+        user.setModified(userDto.getModified());
+        user.setLast_login(userDto.getLast_login());
+        Set<Phone> phones = new HashSet<Phone>();
+        mapPhonesDtoToPhones(userDto.getPhones(), phones);
+        user.addPhones(phones);
     }
 
-    //phonesDto --> phones
-    private void mapPhonesDtoToPhones(ArrayList<PhoneDto> phonesDto, ArrayList<Phone> phones){
+    private void mapUserToUserDto(User user, UserDto userDto) {
+        userDto.setId(user.getId());
+        userDto.setName(user.getName());
+        userDto.setEmail(user.getEmail());
+        userDto.setPassword(user.getPassword());
+        userDto.setIsActive(user.getIsActive());
+        userDto.setCreated(user.getCreated());
+        userDto.setModified(user.getModified());
+        userDto.setLast_login(user.getLast_login());
+        List<PhoneDto> phonesDto = new ArrayList<PhoneDto>();
+        mapPhonesToPhonesDto(user.getPhones(), phonesDto);
+        userDto.setPhones(phonesDto);
+    }
+
+    private void mapPhonesDtoToPhones(List<PhoneDto> phonesDto, Set<Phone> phones){
         for (PhoneDto phoneDto : phonesDto) {
             Phone phone = new Phone();
             phone.setNumber(phoneDto.getNumber());
@@ -76,5 +79,29 @@ public class UserService {
             phone.setCountryCode(phoneDto.getContrycode());
             phones.add(phone);
         }
+    }
+
+    private void mapPhonesToPhonesDto(Set<Phone> phones, List<PhoneDto> phonesDto) {
+        if(phones == null ){return;}
+        for (Phone phone : phones) {
+            PhoneDto phoneDto = new PhoneDto();
+            phoneDto.setNumber(phone.getNumber());
+            phoneDto.setCitycode(phone.getCityCode());
+            phoneDto.setContrycode(phone.getCountryCode());
+            phoneDto.setId(phone.getId());
+            phonesDto.add(phoneDto);
+        }
+    }
+
+
+    public List<UserDto> listAllUsers() {
+        List<User> usuarios = userDaoImp.listAll();
+        List<UserDto> usersDto = new ArrayList<>();
+        for (User user:usuarios) {
+            UserDto userDto = new UserDto();
+            mapUserToUserDto(user, userDto);
+            usersDto.add(userDto);
+        }
+        return usersDto;
     }
 }

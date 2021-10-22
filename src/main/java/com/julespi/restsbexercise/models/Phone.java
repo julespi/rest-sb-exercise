@@ -25,9 +25,16 @@ public class Phone { //Serializable??
     @Getter @Setter
     private String countryCode;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+
+    // ORIGINAL
+    //@ManyToOne(fetch = FetchType.LAZY, optional = false)
+    //@JoinColumn(name = "user_id", nullable = false)
+
+    // SEGUNDO
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @Getter @Setter
     private User user;
+
+
 
 }
