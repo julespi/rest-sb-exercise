@@ -40,6 +40,13 @@ public class UserController {
         return new ResponseEntity<>(uService.listAllUsers(), HttpStatus.OK);
     }
 
+    // TODO volar esto
+    @RequestMapping(value = "api/prueba", method = RequestMethod.GET)
+    public String prueba(){
+        System.out.println(UserDto.class.getSimpleName());
+        return "";
+    }
+
     //   Alta
     @RequestMapping(value = "api/users", method = RequestMethod.POST)
     public ResponseEntity<UserDto> createUsers(@Valid @RequestBody UserDto userDto){

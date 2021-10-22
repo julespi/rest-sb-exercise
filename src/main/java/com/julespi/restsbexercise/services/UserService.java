@@ -40,6 +40,17 @@ public class UserService {
         return newUserDto;
     }
 
+    public List<UserDto> listAllUsers() {
+        List<User> usuarios = userDaoImp.listAll();
+        List<UserDto> usersDto = new ArrayList<>();
+        for (User user:usuarios) {
+            UserDto userDto = new UserDto();
+            mapUserToUserDto(user, userDto);
+            usersDto.add(userDto);
+        }
+        return usersDto;
+    }
+
 
 
     //    ----------   NUEVO      ---------
@@ -93,15 +104,4 @@ public class UserService {
         }
     }
 
-
-    public List<UserDto> listAllUsers() {
-        List<User> usuarios = userDaoImp.listAll();
-        List<UserDto> usersDto = new ArrayList<>();
-        for (User user:usuarios) {
-            UserDto userDto = new UserDto();
-            mapUserToUserDto(user, userDto);
-            usersDto.add(userDto);
-        }
-        return usersDto;
-    }
 }

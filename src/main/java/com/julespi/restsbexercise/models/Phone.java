@@ -2,6 +2,7 @@ package com.julespi.restsbexercise.models;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 
@@ -10,9 +11,11 @@ import javax.persistence.*;
 public class Phone { //Serializable??
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator="system-uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    @Column(unique = true)
     @Getter @Setter
-    private Long id;
+    private String id;
 
     @Getter @Setter
     private String number;
@@ -25,12 +28,6 @@ public class Phone { //Serializable??
     @Getter @Setter
     private String countryCode;
 
-
-    // ORIGINAL
-    //@ManyToOne(fetch = FetchType.LAZY, optional = false)
-    //@JoinColumn(name = "user_id", nullable = false)
-
-    // SEGUNDO
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @Getter @Setter
     private User user;

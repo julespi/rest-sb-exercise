@@ -27,7 +27,6 @@ public class User {
     @Getter @Setter
     private String name;
 
-    @Column(unique = true)
     @Getter @Setter
     private String email;
 
@@ -48,20 +47,16 @@ public class User {
     @Getter @Setter
     private Date last_login;
 
-
-
-    /*@OneToMany(mappedBy = "user", fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)*/
     @OneToMany(
             mappedBy = "user",
             fetch = FetchType.EAGER,
             cascade = CascadeType.ALL
     )
     @Getter
-    private Set<Phone> phones = new HashSet<Phone>();
+    private final Set<Phone> phones = new HashSet<Phone>();
 
+    // TODO ver donde va la validacion del null de newPhones
     public void addPhones(Set<Phone> newPhones){
-        if(newPhones == null ){return;}
         for (Phone phone : newPhones) {
             phone.setUser(this);
             this.phones.add(phone);

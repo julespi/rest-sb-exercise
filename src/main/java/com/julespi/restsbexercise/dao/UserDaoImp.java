@@ -11,7 +11,7 @@ import java.util.Set;
 public class UserDaoImp extends GenericDao<User> {
 
     public List<User> listAll(){
-        return entityManager.createQuery("FROM User").getResultList();
+        return entityManager.createQuery("FROM User",User.class).getResultList();
     }
 
 }
