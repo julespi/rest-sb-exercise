@@ -37,11 +37,11 @@ public class User {
     private Boolean isActive;
 
     @CreationTimestamp
-    @Getter @Setter
+    @Getter
     private Date created;
 
     @UpdateTimestamp
-    @Getter @Setter
+    @Getter
     private Date modified;
 
     @Getter @Setter
@@ -50,13 +50,15 @@ public class User {
     @OneToMany(
             mappedBy = "user",
             fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     @Getter
     private final Set<Phone> phones = new HashSet<Phone>();
 
     // TODO ver donde va la validacion del null de newPhones
     public void addPhones(Set<Phone> newPhones){
+        this.phones.clear();
         for (Phone phone : newPhones) {
             phone.setUser(this);
             this.phones.add(phone);

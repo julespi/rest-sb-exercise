@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "phones")
@@ -31,7 +32,6 @@ public class Phone { //Serializable??
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @Getter @Setter
     private User user;
-
 
 
 }

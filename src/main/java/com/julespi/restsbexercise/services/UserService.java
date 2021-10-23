@@ -1,6 +1,5 @@
 package com.julespi.restsbexercise.services;
 
-import com.julespi.restsbexercise.dao.PhoneDaoImp;
 import com.julespi.restsbexercise.dao.UserDaoImp;
 import com.julespi.restsbexercise.dto.PhoneDto;
 import com.julespi.restsbexercise.dto.UserDto;
@@ -20,28 +19,18 @@ public class UserService {
     @Autowired
     private UserDaoImp userDaoImp;
 
-    @Autowired
-    private PhoneDaoImp phoneDaoImp;
-
     public UserDto addUser(UserDto userDto){
         User newUser = new User();
-
         mapUserDtoToUser(userDto, newUser);
         newUser.setIsActive(true);
-
-        //Set<Phone> phones = new HashSet<Phone>(newUser.getPhones());
-        //newUser.setPhones(null);
-
         User dbUser = userDaoImp.save(newUser);
-
-        //Set<Phone> phonesDb = phoneDaoImp.saveAll(phones,dbUser);
         UserDto newUserDto = new UserDto();
         mapUserToUserDto(dbUser, newUserDto);
         return newUserDto;
     }
 
     public List<UserDto> listAllUsers() {
-        List<User> usuarios = userDaoImp.listAll();
+        List<User> usuarios = userDaoImp.list(User.class);
         List<UserDto> usersDto = new ArrayList<>();
         for (User user:usuarios) {
             UserDto userDto = new UserDto();
@@ -51,17 +40,31 @@ public class UserService {
         return usersDto;
     }
 
+    public UserDto getUser(String id) {
+        User dbUser = userDaoImp.findById(User.class, id);
+        UserDto userDto = new UserDto();
+        mapUserToUserDto(dbUser, userDto);
+        return userDto;
+    }
+
+    public UserDto updateUser(UserDto userDto, String id) throws RuntimeException{
+        User dbUser = userDaoImp.findById(User.class, id);
+        mapUserDtoToUser(userDto, dbUser);
+        userDaoImp.update(dbUser);
+        UserDto updatedUserDto = new UserDto();
+        mapUserToUserDto(dbUser, updatedUserDto);
+        return updatedUserDto;
+    }
 
 
-    //    ----------   NUEVO      ---------
     private void mapUserDtoToUser(UserDto userDto, User user) {
-        // TODO id?
+        user.setId(userDto.getId());
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
         user.setPassword(userDto.getPassword());
         user.setIsActive(userDto.getIsActive());
-        user.setCreated(userDto.getCreated());
-        user.setModified(userDto.getModified());
+        //user.setCreated(userDto.getCreated());
+        //user.setModified(userDto.getModified());
         user.setLast_login(userDto.getLast_login());
         Set<Phone> phones = new HashSet<Phone>();
         mapPhonesDtoToPhones(userDto.getPhones(), phones);
@@ -85,6 +88,7 @@ public class UserService {
     private void mapPhonesDtoToPhones(List<PhoneDto> phonesDto, Set<Phone> phones){
         for (PhoneDto phoneDto : phonesDto) {
             Phone phone = new Phone();
+            phone.setId(phoneDto.getId());
             phone.setNumber(phoneDto.getNumber());
             phone.setCityCode(phoneDto.getCitycode());
             phone.setCountryCode(phoneDto.getContrycode());
@@ -96,6 +100,7 @@ public class UserService {
         if(phones == null ){return;}
         for (Phone phone : phones) {
             PhoneDto phoneDto = new PhoneDto();
+            phoneDto.setId(phone.getId());
             phoneDto.setNumber(phone.getNumber());
             phoneDto.setCitycode(phone.getCityCode());
             phoneDto.setContrycode(phone.getCountryCode());

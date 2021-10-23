@@ -18,15 +18,14 @@ public class UserController {
     @Autowired
     private UserService uService;
 
-    /*@RequestMapping(value = "api/users/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "api/user/{id}", method = RequestMethod.GET)
     public ResponseEntity<UserDto> detailUsers(@PathVariable String id){
-        // TODO y si viene vacio?
-        UserDto userDto = uService.getUserById(id);
+        UserDto userDto = uService.getUser(id);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
-    }*/
+    }
     /*
     // TODO ver q onda esto
-    @RequestMapping(value = "api/users", method = RequestMethod.GET)
+    @RequestMapping(value = "api/user", method = RequestMethod.GET)
     public ResponseEntity<UserDto> getUserByParam(@RequestParam Optional<String> email){
         UserDto userDto;
         if(id.isPresent()){
@@ -35,20 +34,20 @@ public class UserController {
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }*/
 
-    @RequestMapping(value = "api/users", method = RequestMethod.GET)
+    @RequestMapping(value = "api/user", method = RequestMethod.GET)
     public ResponseEntity<List<UserDto>> listAllUsers(){
         return new ResponseEntity<>(uService.listAllUsers(), HttpStatus.OK);
     }
 
-    // TODO volar esto
-    @RequestMapping(value = "api/prueba", method = RequestMethod.GET)
-    public String prueba(){
-        System.out.println(UserDto.class.getSimpleName());
-        return "";
+    // UPDATE
+    @RequestMapping(value = "api/user/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto userDto, @PathVariable String id) {
+        UserDto updatedUserDto = uService.updateUser(userDto, id);
+        return new ResponseEntity<>(updatedUserDto, HttpStatus.OK);
     }
 
     //   Alta
-    @RequestMapping(value = "api/users", method = RequestMethod.POST)
+    @RequestMapping(value = "api/user", method = RequestMethod.POST)
     public ResponseEntity<UserDto> createUsers(@Valid @RequestBody UserDto userDto){
         UserDto returnUserDto = uService.addUser(userDto);
         return new ResponseEntity<>(returnUserDto, HttpStatus.CREATED);
@@ -66,7 +65,14 @@ public class UserController {
         return errors;
     }
 
-
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseBody
+    public Map<String, String> handleRunTimeException(RuntimeException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", ex.getMessage());
+        return errors;
+    }
 
 
 }
