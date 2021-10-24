@@ -4,10 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.validation.constraints.Null;
+import javax.validation.constraints.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,10 +19,15 @@ public class UserDto {
     private String name;
 
     @NotBlank(message = "email is required")
+    @Email(message = "email is not valid")
     @Getter @Setter
     private String email;
 
     @NotBlank(message = "password is required")
+    @Pattern(
+            regexp = "^(?=.*[A-Z])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{6,}$",
+            message = "Password must contain at least one uppercase, three lowercase and two numbers"
+    )
     @Getter @Setter
     private String password;
 

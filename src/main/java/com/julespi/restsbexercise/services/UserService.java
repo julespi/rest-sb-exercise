@@ -1,17 +1,22 @@
 package com.julespi.restsbexercise.services;
 
 import com.julespi.restsbexercise.dao.UserDaoImp;
+import com.julespi.restsbexercise.dto.JwtResponseDto;
 import com.julespi.restsbexercise.dto.PhoneDto;
 import com.julespi.restsbexercise.dto.UserDto;
+import com.julespi.restsbexercise.dto.JwtRequestDto;
 import com.julespi.restsbexercise.models.Phone;
 import com.julespi.restsbexercise.models.User;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -19,9 +24,15 @@ public class UserService {
     @Autowired
     private UserDaoImp userDaoImp;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public UserDto addUser(UserDto userDto){
         User newUser = new User();
         mapUserDtoToUser(userDto, newUser);
+        if(!isEmailAvailable(newUser.getEmail())){
+            throw new RuntimeException("email already taken");
+        }
         newUser.setIsActive(true);
         User dbUser = userDaoImp.save(newUser);
         UserDto newUserDto = new UserDto();
@@ -30,9 +41,10 @@ public class UserService {
     }
 
     public List<UserDto> listAllUsers() {
-        List<User> usuarios = userDaoImp.list(User.class);
+        List<User> allUsers = userDaoImp.list(User.class);
+        //List<User> activeUsers = allUsers.stream().filter(User::getIsActive).collect(Collectors.toList());
         List<UserDto> usersDto = new ArrayList<>();
-        for (User user:usuarios) {
+        for (User user:allUsers) {
             UserDto userDto = new UserDto();
             mapUserToUserDto(user, userDto);
             usersDto.add(userDto);
@@ -56,15 +68,71 @@ public class UserService {
         return updatedUserDto;
     }
 
+    public void deleteUser(String id) {
+        User dbUser = userDaoImp.findById(User.class, id);
+        dbUser.setIsActive(false);
+        userDaoImp.update(dbUser);
+    }
+
+    /*public Boolean login(String email, String password) throws RuntimeException{
+        User dbUser = userDaoImp.findByEmail(email);
+        if(dbUser != null && passwordEncoder.matches(password, dbUser.getPassword())){
+            return true;
+        }
+        throw new RuntimeException("invalid email or password");
+    }*/
+
+    public JwtResponseDto login(JwtRequestDto jwtRequestDto){
+        User dbUser = userDaoImp.findByEmail(jwtRequestDto.getEmail());
+        if(dbUser == null || !passwordEncoder.matches(jwtRequestDto.getPassword(), dbUser.getPassword())){
+            throw new RuntimeException("invalid email or password");
+        }
+        String token = getJWTToken(dbUser.getEmail());
+        // TODO ver como resolver esto. tira que tiene 259 caracteres
+        // dbUser.setToken(token);
+        dbUser.updateLastLogin();
+        userDaoImp.update(dbUser);
+        JwtResponseDto response = new JwtResponseDto();
+        response.setId(dbUser.getId());
+        response.setToken(token);
+        response.setEmail(dbUser.getEmail());
+        return response;
+
+    }
+
+    private String getJWTToken(String username) {
+        String secretKey = "mySecretKey";
+        List<GrantedAuthority> grantedAuthorities = AuthorityUtils
+                .commaSeparatedStringToAuthorityList("ROLE_USER");
+
+        String token = Jwts
+                .builder()
+                .setId("softtekJWT")
+                .setSubject(username)
+                .claim("authorities",
+                        grantedAuthorities.stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .collect(Collectors.toList()))
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 600000))
+                .signWith(SignatureAlgorithm.HS512,
+                        secretKey.getBytes()).compact();
+
+        return "Bearer " + token;
+    }
+
+    public Boolean isEmailAvailable(String email){
+        User dbUser = userDaoImp.findByEmail(email);
+        return dbUser == null;
+    }
+
 
     private void mapUserDtoToUser(UserDto userDto, User user) {
         user.setId(userDto.getId());
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
-        user.setPassword(userDto.getPassword());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setIsActive(userDto.getIsActive());
-        //user.setCreated(userDto.getCreated());
-        //user.setModified(userDto.getModified());
         user.setLast_login(userDto.getLast_login());
         Set<Phone> phones = new HashSet<Phone>();
         mapPhonesDtoToPhones(userDto.getPhones(), phones);

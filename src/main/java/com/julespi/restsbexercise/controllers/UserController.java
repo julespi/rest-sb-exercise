@@ -1,6 +1,8 @@
 package com.julespi.restsbexercise.controllers;
 
+import com.julespi.restsbexercise.dto.JwtResponseDto;
 import com.julespi.restsbexercise.dto.UserDto;
+import com.julespi.restsbexercise.dto.JwtRequestDto;
 import com.julespi.restsbexercise.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,10 +20,18 @@ public class UserController {
     @Autowired
     private UserService uService;
 
+    // DETAL
     @RequestMapping(value = "api/user/{id}", method = RequestMethod.GET)
     public ResponseEntity<UserDto> detailUsers(@PathVariable String id){
         UserDto userDto = uService.getUser(id);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
+    }
+
+    // DELETE
+    @RequestMapping(value = "api/user/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<UserDto> deletelUsers(@PathVariable String id){
+        uService.deleteUser(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     /*
     // TODO ver q onda esto
@@ -34,6 +44,7 @@ public class UserController {
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }*/
 
+    // LIST
     @RequestMapping(value = "api/user", method = RequestMethod.GET)
     public ResponseEntity<List<UserDto>> listAllUsers(){
         return new ResponseEntity<>(uService.listAllUsers(), HttpStatus.OK);
@@ -46,11 +57,18 @@ public class UserController {
         return new ResponseEntity<>(updatedUserDto, HttpStatus.OK);
     }
 
-    //   Alta
+    //   NEW
     @RequestMapping(value = "api/user", method = RequestMethod.POST)
     public ResponseEntity<UserDto> createUsers(@Valid @RequestBody UserDto userDto){
         UserDto returnUserDto = uService.addUser(userDto);
         return new ResponseEntity<>(returnUserDto, HttpStatus.CREATED);
+    }
+
+    //   LOGIN
+    @RequestMapping(value = "api/login", method = RequestMethod.POST)
+    public ResponseEntity<JwtResponseDto> login(@Valid @RequestBody JwtRequestDto jwtRequestDto){
+        JwtResponseDto response = uService.login(jwtRequestDto);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

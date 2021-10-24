@@ -5,7 +5,6 @@ import lombok.Setter;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Persister;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
@@ -18,23 +17,34 @@ import java.util.Set;
 public class User {
 
     @Id
-    @GeneratedValue(generator="system-uuid")
-    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid")
     @Column(unique = true)
-    @Getter @Setter
+    @Getter
+    @Setter
     private String id;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String name;
 
-    @Getter @Setter
+    @Column(unique = true)
+    @Getter
+    @Setter
     private String email;
 
-    @Getter @Setter
+    @Column(length = 60)
+    @Getter
+    @Setter
     private String password;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Boolean isActive;
+
+    @Getter
+    @Setter
+    private String token;
 
     @CreationTimestamp
     @Getter
@@ -44,7 +54,8 @@ public class User {
     @Getter
     private Date modified;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Date last_login;
 
     @OneToMany(
@@ -57,7 +68,7 @@ public class User {
     private final Set<Phone> phones = new HashSet<Phone>();
 
     // TODO ver donde va la validacion del null de newPhones
-    public void addPhones(Set<Phone> newPhones){
+    public void addPhones(Set<Phone> newPhones) {
         this.phones.clear();
         for (Phone phone : newPhones) {
             phone.setUser(this);
@@ -79,4 +90,7 @@ public class User {
     }
 
 
+    public void updateLastLogin() {
+        this.setLast_login(new Date());
+    }
 }
