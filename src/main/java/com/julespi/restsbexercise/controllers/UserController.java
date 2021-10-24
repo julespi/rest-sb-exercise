@@ -20,6 +20,17 @@ public class UserController {
     @Autowired
     private UserService uService;
 
+    // TODO Borrar
+    @RequestMapping(value = "api/initdb", method = RequestMethod.GET)
+    public ResponseEntity<UserDto> init_db(){
+        UserDto userDto = new UserDto();
+        userDto.setName("Julian Spinelli");
+        userDto.setEmail("julespi@gmail.com");
+        userDto.setPassword("Password88");
+        UserDto returnUserDto = uService.addUser(userDto);
+        return new ResponseEntity<>(returnUserDto, HttpStatus.CREATED);
+    }
+
     // DETAL
     @RequestMapping(value = "api/user/{id}", method = RequestMethod.GET)
     public ResponseEntity<UserDto> detailUsers(@PathVariable String id){

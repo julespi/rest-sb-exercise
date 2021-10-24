@@ -9,6 +9,7 @@ import com.julespi.restsbexercise.models.Phone;
 import com.julespi.restsbexercise.models.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -19,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Log4j2
 public class UserService {
 
     @Autowired
@@ -27,14 +29,17 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UserDto addUser(UserDto userDto){
+    public UserDto addUser(UserDto userDto) {
         User newUser = new User();
         mapUserDtoToUser(userDto, newUser);
-        if(!isEmailAvailable(newUser.getEmail())){
+        if (!isEmailAvailable(newUser.getEmail())) {
+            log.error("Email already taken:" + newUser.getEmail());
             throw new RuntimeException("email already taken");
         }
         newUser.setIsActive(true);
+        newUser.updateLastLogin();
         User dbUser = userDaoImp.save(newUser);
+        log.info("User added to database");
         UserDto newUserDto = new UserDto();
         mapUserToUserDto(dbUser, newUserDto);
         return newUserDto;
@@ -44,7 +49,7 @@ public class UserService {
         List<User> allUsers = userDaoImp.list(User.class);
         //List<User> activeUsers = allUsers.stream().filter(User::getIsActive).collect(Collectors.toList());
         List<UserDto> usersDto = new ArrayList<>();
-        for (User user:allUsers) {
+        for (User user : allUsers) {
             UserDto userDto = new UserDto();
             mapUserToUserDto(user, userDto);
             usersDto.add(userDto);
@@ -59,7 +64,7 @@ public class UserService {
         return userDto;
     }
 
-    public UserDto updateUser(UserDto userDto, String id) throws RuntimeException{
+    public UserDto updateUser(UserDto userDto, String id) throws RuntimeException {
         User dbUser = userDaoImp.findById(User.class, id);
         mapUserDtoToUser(userDto, dbUser);
         userDaoImp.update(dbUser);
@@ -82,19 +87,21 @@ public class UserService {
         throw new RuntimeException("invalid email or password");
     }*/
 
-    public JwtResponseDto login(JwtRequestDto jwtRequestDto){
+    public JwtResponseDto login(JwtRequestDto jwtRequestDto) {
         User dbUser = userDaoImp.findByEmail(jwtRequestDto.getEmail());
-        if(dbUser == null || !passwordEncoder.matches(jwtRequestDto.getPassword(), dbUser.getPassword())){
+        if (dbUser == null || !passwordEncoder.matches(jwtRequestDto.getPassword(), dbUser.getPassword())) {
+            log.error("Invalid email or password");
             throw new RuntimeException("invalid email or password");
         }
         String token = getJWTToken(dbUser.getEmail());
         // TODO ver como resolver esto. tira que tiene 259 caracteres
-        // dbUser.setToken(token);
+        dbUser.setToken(token);
         dbUser.updateLastLogin();
         userDaoImp.update(dbUser);
+        log.info("User authenticated");
         JwtResponseDto response = new JwtResponseDto();
         response.setId(dbUser.getId());
-        response.setToken(token);
+        response.setToken(dbUser.getToken());
         response.setEmail(dbUser.getEmail());
         return response;
 
@@ -121,7 +128,7 @@ public class UserService {
         return "Bearer " + token;
     }
 
-    public Boolean isEmailAvailable(String email){
+    public Boolean isEmailAvailable(String email) {
         User dbUser = userDaoImp.findByEmail(email);
         return dbUser == null;
     }
@@ -153,7 +160,7 @@ public class UserService {
         userDto.setPhones(phonesDto);
     }
 
-    private void mapPhonesDtoToPhones(List<PhoneDto> phonesDto, Set<Phone> phones){
+    private void mapPhonesDtoToPhones(List<PhoneDto> phonesDto, Set<Phone> phones) {
         for (PhoneDto phoneDto : phonesDto) {
             Phone phone = new Phone();
             phone.setId(phoneDto.getId());
@@ -165,7 +172,9 @@ public class UserService {
     }
 
     private void mapPhonesToPhonesDto(Set<Phone> phones, List<PhoneDto> phonesDto) {
-        if(phones == null ){return;}
+        if (phones == null) {
+            return;
+        }
         for (Phone phone : phones) {
             PhoneDto phoneDto = new PhoneDto();
             phoneDto.setId(phone.getId());

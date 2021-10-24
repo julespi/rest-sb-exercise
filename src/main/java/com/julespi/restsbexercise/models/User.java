@@ -42,6 +42,8 @@ public class User {
     @Setter
     private Boolean isActive;
 
+    @Lob
+    @Column(length = 300)
     @Getter
     @Setter
     private String token;
