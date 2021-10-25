@@ -29,6 +29,10 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    public String borrar(){
+        return "Hola";
+    }
+
     public UserDto addUser(UserDto userDto) {
         User newUser = new User();
         mapUserDtoToUser(userDto, newUser);
