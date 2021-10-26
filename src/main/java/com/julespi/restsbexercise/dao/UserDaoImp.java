@@ -16,7 +16,7 @@ public class UserDaoImp extends GenericDao<User> {
                 .setParameter("email",email)
                 .getResultList();
         if(!users.isEmpty()){
-            return users.get(0);
+            return users.get(0); // should throw same exception as findById()
         }
         return null;
     }

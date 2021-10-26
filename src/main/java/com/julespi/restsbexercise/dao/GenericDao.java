@@ -35,10 +35,10 @@ public abstract class GenericDao<T>{
 
     public T update(T t){
         entityManager.merge(t);
-        return t;
+        return t; // TODO volar este return
     }
 
     public boolean contains(T t){
         return entityManager.contains(t);
-    }
+    } //TODO vuela este  metodo?
 }
