@@ -69,7 +69,7 @@ public class User {
     @Getter
     private final Set<Phone> phones = new HashSet<Phone>();
 
-    // TODO ver donde va la validacion del null de newPhones
+
     public void addPhones(Set<Phone> newPhones) {
         this.phones.clear();
         for (Phone phone : newPhones) {
@@ -77,20 +77,6 @@ public class User {
             this.phones.add(phone);
         }
     }
-
-
-    // TODO volar esto
-    @PrePersist
-    private void onPersistCallback() {
-        System.out.println("persiste");
-    }
-
-    // TODO volar esto
-    @PreUpdate
-    private void onUpdateCallback() {
-        System.out.println("updatea");
-    }
-
 
     public void updateLastLogin() {
         this.setLast_login(new Date());

@@ -7,17 +7,14 @@ import com.julespi.restsbexercise.dto.UserDto;
 import com.julespi.restsbexercise.dto.JwtRequestDto;
 import com.julespi.restsbexercise.models.Phone;
 import com.julespi.restsbexercise.models.User;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static com.julespi.restsbexercise.utils.JwtUtils.getJWTToken;
 
 @Service
 @Log4j2
@@ -29,10 +26,11 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public String borrar(){
-        return "Hola";
-    }
-
+    /**
+     *
+     * @param userDto
+     * @return newUserDTo
+     */
     public UserDto addUser(UserDto userDto) {
         User newUser = new User();
         mapUserDtoToUser(userDto, newUser);
@@ -51,7 +49,6 @@ public class UserService {
 
     public List<UserDto> listAllUsers() {
         List<User> allUsers = userDaoImp.list(User.class);
-        //List<User> activeUsers = allUsers.stream().filter(User::getIsActive).collect(Collectors.toList());
         List<UserDto> usersDto = new ArrayList<>();
         for (User user : allUsers) {
             UserDto userDto = new UserDto();
@@ -61,7 +58,7 @@ public class UserService {
         return usersDto;
     }
 
-    public UserDto getUser(String id) {
+    public UserDto getUser(String id) throws RuntimeException{
         User dbUser = userDaoImp.findById(User.class, id);
         UserDto userDto = new UserDto();
         mapUserToUserDto(dbUser, userDto);
@@ -83,14 +80,6 @@ public class UserService {
         userDaoImp.update(dbUser);
     }
 
-    /*public Boolean login(String email, String password) throws RuntimeException{
-        User dbUser = userDaoImp.findByEmail(email);
-        if(dbUser != null && passwordEncoder.matches(password, dbUser.getPassword())){
-            return true;
-        }
-        throw new RuntimeException("invalid email or password");
-    }*/
-
     public JwtResponseDto login(JwtRequestDto jwtRequestDto) {
         User dbUser = userDaoImp.findByEmail(jwtRequestDto.getEmail());
         if (dbUser == null || !passwordEncoder.matches(jwtRequestDto.getPassword(), dbUser.getPassword())) {
@@ -98,7 +87,6 @@ public class UserService {
             throw new RuntimeException("invalid email or password");
         }
         String token = getJWTToken(dbUser.getEmail());
-        // TODO ver como resolver esto. tira que tiene 259 caracteres
         dbUser.setToken(token);
         dbUser.updateLastLogin();
         userDaoImp.update(dbUser);
@@ -108,31 +96,9 @@ public class UserService {
         response.setToken(dbUser.getToken());
         response.setEmail(dbUser.getEmail());
         return response;
-
     }
 
-    private String getJWTToken(String username) {
-        String secretKey = "mySecretKey";
-        List<GrantedAuthority> grantedAuthorities = AuthorityUtils
-                .commaSeparatedStringToAuthorityList("ROLE_USER");
-
-        String token = Jwts
-                .builder()
-                .setId("softtekJWT")
-                .setSubject(username)
-                .claim("authorities",
-                        grantedAuthorities.stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .collect(Collectors.toList()))
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 600000))
-                .signWith(SignatureAlgorithm.HS512,
-                        secretKey.getBytes()).compact();
-
-        return "Bearer " + token;
-    }
-
-    public Boolean isEmailAvailable(String email) {
+    private Boolean isEmailAvailable(String email) {
         User dbUser = userDaoImp.findByEmail(email);
         return dbUser == null;
     }

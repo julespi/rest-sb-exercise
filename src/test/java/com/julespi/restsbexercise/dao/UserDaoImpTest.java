@@ -2,12 +2,9 @@ package com.julespi.restsbexercise.dao;
 
 import com.julespi.restsbexercise.models.User;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.List;
 
@@ -16,14 +13,6 @@ public class UserDaoImpTest {
 
     @Autowired
     UserDaoImp userDaoImp;
-
-    @Autowired
-    EntityManager entityManager;
-
-    @BeforeAll
-    public static void setUp() {
-        System.out.println("------------- TEST --------------");
-    }
 
 
     @Test
