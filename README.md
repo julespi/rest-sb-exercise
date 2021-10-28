@@ -5,7 +5,7 @@ El siguiente documento explica los pasos The following was discovered as part of
 2) navegador y entrar a localhost:8080/h2-console y "Connect"
 3) Utilizando una aplicion que le permita realizar peticiones a una api como POSTMAN, INSOMNIA, etc. NOTA: Se encuentra disponible en ********* una coleccion JSON de peticiones para ser importada en POSTMAN. Caso contrario, mas abajo cuenta con la lista de endpoints a la API.
 4) **PARA UN CORRECTO FUNCIONAMIENTO DEBE REALIZAR LA EJECUCION DE localhost:8080/api/initdb**
-![Image of docker-compose command with option up](https://github.com/julespi/rest-sb-exercise/blob/master/images/init_db.png)
+![Image of docker-compose command with option up](https://github.com/julespi/rest-sb-exercise/blob/main/images/init_db.png)
 5)
 
 * The original package name 'com.julespi.rest-sb-exercise' is invalid and this project uses 'com.julespi.restsbexercise' instead.
