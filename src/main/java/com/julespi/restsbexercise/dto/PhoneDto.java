@@ -21,4 +21,13 @@ public class PhoneDto{
     @NotBlank(message = "countrycode number is required")
     @Getter @Setter
     private String contrycode;
+
+    public PhoneDto(String number, String citycode, String contrycode) {
+        this.number = number;
+        this.citycode = citycode;
+        this.contrycode = contrycode;
+    }
+
+    public PhoneDto() {
+    }
 }

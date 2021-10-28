@@ -8,7 +8,9 @@ import com.julespi.restsbexercise.dto.UserDto;
 import com.julespi.restsbexercise.models.User;
 import com.julespi.restsbexercise.services.UserService;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -28,20 +30,11 @@ public class UserServiceTest {
 
     private UserDto createUserDto(){
         List<PhoneDto> phones =new ArrayList<>();
-        PhoneDto phone1 = new PhoneDto();
-        phone1.setNumber("123456789");
-        phone1.setCitycode("221");
-        phone1.setContrycode("54");
-        PhoneDto phone2 = new PhoneDto();
-        phone2.setNumber("987654321");
-        phone2.setCitycode("11");
-        phone2.setContrycode("55");
+        PhoneDto phone1 = new PhoneDto("123456789","221","54");
+        PhoneDto phone2 = new PhoneDto("987654321","11","55");
         phones.add(phone1);
         phones.add(phone2);
-        UserDto newUserDto = new UserDto();
-        newUserDto.setName("User Julian Test");
-        newUserDto.setEmail("test@test.com");
-        newUserDto.setPassword("Password123");
+        UserDto newUserDto = new UserDto("User Julian Test","test@test.com","Password123");
         newUserDto.setPhones(phones);
         return newUserDto;
     }

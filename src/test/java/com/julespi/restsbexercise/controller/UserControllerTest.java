@@ -1,26 +1,19 @@
 package com.julespi.restsbexercise.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import com.julespi.restsbexercise.dao.UserDaoImp;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.julespi.restsbexercise.dto.JwtResponseDto;
 import com.julespi.restsbexercise.dto.PhoneDto;
 import com.julespi.restsbexercise.dto.UserDto;
-import com.julespi.restsbexercise.models.User;
 import com.julespi.restsbexercise.services.UserService;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -43,10 +36,10 @@ public class UserControllerTest {
 
     @Test
     @Transactional
-    public void testDetailUser() {
+    public void testListUser() {
         ResponseEntity<UserDto> forbResponse = this.restTemplate.getForEntity("/api/user", UserDto.class);
         Assertions.assertEquals(HttpStatus.FORBIDDEN, forbResponse.getStatusCode());
-        HttpEntity<HttpHeaders> httpEntity = login(this.userDto.getEmail(), "Password88");
+        HttpEntity<HttpHeaders> httpEntity = doLogin(this.userDto.getEmail());
         ResponseEntity<List<UserDto>> response =
                 this.restTemplate.exchange(
                         "/api/user",
@@ -57,30 +50,38 @@ public class UserControllerTest {
                 );
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertDoesNotThrow(() -> {
-            response.getBody().size();
+            response.getBody().isEmpty();
         });
-        Assertions.assertEquals(1, response.getBody().size());
-        Assertions.assertEquals(
-                userDto.getName(),
-                response.getBody().get(0).getName()
-        );
-        Assertions.assertEquals(
-                userDto.getEmail(),
-                response.getBody().get(0).getEmail()
+        Assertions.assertFalse(response.getBody().isEmpty());
+        Assertions.assertFalse(
+                response.getBody().get(0).getId().isEmpty()
         );
         Assertions.assertFalse(
                 response.getBody().get(0).getPhones().isEmpty()
         );
-        Assertions.assertEquals(
-                userDto.getPhones().size(),
-                response.getBody().get(0).getPhones().size()
-        );
-        Assertions.assertEquals(
-                userDto.getPhones().get(0).getNumber(),
-                response.getBody().get(0).getPhones().get(0).getNumber()
+    }
 
-        );
 
+    @Test
+    @Transactional
+    public void testDetailUser() {
+        ResponseEntity<UserDto> forbResponse =
+                this.restTemplate.getForEntity("/api/user/" + userDto.getId(), UserDto.class);
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, forbResponse.getStatusCode());
+        HttpEntity<HttpHeaders> httpEntity = doLogin(this.userDto.getEmail());
+        ResponseEntity<UserDto> response =
+                this.restTemplate.exchange(
+                        "/api/user/" + userDto.getId(),
+                        HttpMethod.GET,
+                        httpEntity,
+                        UserDto.class
+                );
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertNotNull(response.getBody());
+        Assertions.assertEquals(
+                userDto.getId(),
+                response.getBody().getId()
+        );
     }
 
     @Test
@@ -88,22 +89,21 @@ public class UserControllerTest {
     public void testDeleteUser() {
         ResponseEntity<String> forbResponse =
                 this.restTemplate.exchange(
-                        "/api/user/"+this.userDto.getId(),
+                        "/api/user/" + this.userDto.getId(),
                         HttpMethod.DELETE,
                         null,
                         String.class
                 );
         Assertions.assertEquals(HttpStatus.FORBIDDEN, forbResponse.getStatusCode());
-        HttpEntity<HttpHeaders> httpEntity = login(this.userDto.getEmail(), "Password88");
+        HttpEntity<HttpHeaders> httpEntity = doLogin(this.userDto.getEmail());
         ResponseEntity<Object> response =
                 this.restTemplate.exchange(
-                        "/api/user/"+this.userDto.getId(),
+                        "/api/user/" + this.userDto.getId(),
                         HttpMethod.DELETE,
                         httpEntity,
                         Object.class
                 );
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        // TODO tengo que probar que le hizo una baja logica?
     }
 
     @Test
@@ -117,65 +117,90 @@ public class UserControllerTest {
                         String.class
                 );
         Assertions.assertEquals(HttpStatus.FORBIDDEN, forbResponse.getStatusCode());
-        HttpEntity<HttpHeaders> httpEntity = login(this.userDto.getEmail(), "Password88");
+        HttpEntity<HttpHeaders> httpEntity = doLogin(this.userDto.getEmail());
 
-        JSONObject body = new JSONObject();
+        String updatedName = "Updated Name";
+        userDto.setPassword("Password88"); //If I don't do this, it updates and re hashes the password. This should be done differently
+        userDto.setName(updatedName);
+        String body = "";
+        ObjectMapper mapper = new ObjectMapper();
         try {
-            body.put("name",userDto.getName());
-            body.put("email",userDto.getEmail());
-        } catch (JSONException e) {
+            body = mapper.writeValueAsString(userDto);
+        } catch (IOException e) {
             e.printStackTrace();
         }
+        HttpEntity<String> httpEntityForUpdate = new HttpEntity<>(body, httpEntity.getHeaders());
 
-
-        HttpEntity<String> httpEntityForUpdate = new HttpEntity<>(body.toString(), httpEntity.getHeaders());
-
-        ResponseEntity<String> response =
+        ResponseEntity<UserDto> response =
                 this.restTemplate.exchange(
-                        "/api/user/"+this.userDto.getId(),
+                        "/api/user/" + this.userDto.getId(),
                         HttpMethod.PUT,
                         httpEntityForUpdate,
+                        UserDto.class
+                );
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertNotNull(response.getBody());
+        Assertions.assertEquals(userDto.getId(), response.getBody().getId());
+        Assertions.assertEquals(updatedName, response.getBody().getName());
+    }
+
+
+    @Test
+    @Transactional
+    public void testNewUser() {
+        ResponseEntity<String> forbResponse =
+                this.restTemplate.exchange(
+                        "/api/user",
+                        HttpMethod.POST,
+                        null,
                         String.class
                 );
-        Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        // TODO validar respuesta?
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, forbResponse.getStatusCode());
+        HttpEntity<HttpHeaders> httpEntity = doLogin(this.userDto.getEmail());
+
+        UserDto newUser = new UserDto(
+                "New User",
+                "new@user.com",
+                "Newpassword88"
+        );
+        PhoneDto phone = new PhoneDto(
+                "123456789",
+                "221",
+                "54"
+        );
+        newUser.getPhones().add(phone);
+        String body = "";
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            body = mapper.writeValueAsString(newUser);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        HttpEntity<String> httpEntityForNew = new HttpEntity<>(body, httpEntity.getHeaders());
+
+        ResponseEntity<UserDto> response =
+                this.restTemplate.exchange(
+                        "/api/user",
+                        HttpMethod.POST,
+                        httpEntityForNew,
+                        UserDto.class
+                );
+        Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        Assertions.assertNotNull(response.getBody());
+        Assertions.assertEquals(newUser.getName(), response.getBody().getName());
     }
 
-    /*private UserDto initDb() {
-        ResponseEntity<UserDto> response = this.restTemplate.getForEntity("/api/initdb", UserDto.class);
-        return response.getBody();
-    }
 
-
-    private UserDto createUserDto() {
-        List<PhoneDto> phones = new ArrayList<>();
-        PhoneDto phone1 = new PhoneDto();
-        phone1.setNumber("123456789");
-        phone1.setCitycode("221");
-        phone1.setContrycode("54");
-        PhoneDto phone2 = new PhoneDto();
-        phone2.setNumber("987654321");
-        phone2.setCitycode("11");
-        phone2.setContrycode("55");
-        phones.add(phone1);
-        phones.add(phone2);
-        UserDto newUserDto = new UserDto();
-        newUserDto.setName("User Julian Test");
-        newUserDto.setEmail("test@test.com");
-        newUserDto.setPassword("Password123");
-        newUserDto.setPhones(phones);
-        return newUserDto;
-    }*/
-
-    private HttpEntity<HttpHeaders> login(String email, String password) {
-
+    @Test
+    @Transactional
+    public void testLoginAccepted() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.ALL));
 
         Map<String, String> map = new HashMap<>();
-        map.put("email", email);
-        map.put("password", password); //TODO this should be cleaner
+        map.put("email", userDto.getEmail());
+        map.put("password", "Password88"); //TODO this should be cleaner
 
 
         HttpEntity<Map<String, String>> request = new HttpEntity<>(map, headers);
@@ -190,20 +215,48 @@ public class UserControllerTest {
         String token = tokenResponse.getBody().getToken();
         Assertions.assertNotNull(token);
         Assertions.assertFalse(token.isEmpty());
+        Assertions.assertEquals(userDto.getEmail(), tokenResponse.getBody().getEmail());
+    }
 
+    @Test
+    @Transactional
+    public void testLoginRejected() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.ALL));
+
+        Map<String, String> map = new HashMap<>();
+        map.put("email", "some@email.com");
+        map.put("password", "Notapassword88");
+
+
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(map, headers);
+
+        ResponseEntity<JwtResponseDto> tokenResponse = this.restTemplate
+                .postForEntity("/api/login", request, JwtResponseDto.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, tokenResponse.getStatusCode());
+    }
+
+
+    private HttpEntity<HttpHeaders> doLogin(String email) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.ALL));
+
+        Map<String, String> map = new HashMap<>();
+        map.put("email", email);
+        map.put("password", "Password88"); //TODO this should be cleaner
+
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(map, headers);
+        ResponseEntity<JwtResponseDto> tokenResponse = this.restTemplate
+                .postForEntity("/api/login", request, JwtResponseDto.class);
+        String token = tokenResponse.getBody().getToken();
 
         HttpHeaders authHeader = new HttpHeaders();
         authHeader.add("Authorization", token);
         authHeader.setContentType(MediaType.APPLICATION_JSON);
 
         return new HttpEntity<>(authHeader);
-        /*ResponseEntity<List<UserDto>> responseFromSecuredEndPoint =
-                this.restTemplate.exchange(
-                        "/api/user",
-                        HttpMethod.GET,
-                        httpEntity,
-                        new ParameterizedTypeReference<List<UserDto>>() {}
-                );
-        System.out.println("asd");*/
     }
 }

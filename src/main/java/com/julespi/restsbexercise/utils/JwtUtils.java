@@ -23,7 +23,7 @@ public class JwtUtils {
                 .setId("softtekJWT")
                 .setSubject(username)
                 .claim("authorities",
-                        grantedAuthorities.stream() // TODO GlobalLogic Java 8
+                        grantedAuthorities.stream() // GlobalLogic: Java 8 new feature in use: Stream
                                 .map(GrantedAuthority::getAuthority)
                                 .collect(Collectors.toList()))
                 .setIssuedAt(new Date(System.currentTimeMillis()))

@@ -52,4 +52,11 @@ public class UserDto {
     public UserDto() {
         this.phones = new ArrayList<>();
     }
+
+    public UserDto(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.phones = new ArrayList<>();
+    }
 }
