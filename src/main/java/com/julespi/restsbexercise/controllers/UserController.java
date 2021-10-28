@@ -1,6 +1,7 @@
 package com.julespi.restsbexercise.controllers;
 
 import com.julespi.restsbexercise.dto.JwtResponseDto;
+import com.julespi.restsbexercise.dto.PhoneDto;
 import com.julespi.restsbexercise.dto.UserDto;
 import com.julespi.restsbexercise.dto.JwtRequestDto;
 import com.julespi.restsbexercise.services.UserService;
@@ -20,18 +21,26 @@ public class UserController {
     @Autowired
     private UserService uService;
 
-    // TODO Borrar
+
     @RequestMapping(value = "api/initdb", method = RequestMethod.GET)
-    public ResponseEntity<UserDto> init_db(){
+    public ResponseEntity<UserDto> initDb(){
+        // TODO This should not be done like this but in a script that clears the DB first
         UserDto userDto = new UserDto();
         userDto.setName("Julian Spinelli");
         userDto.setEmail("julespi@gmail.com");
         userDto.setPassword("Password88");
+        PhoneDto phone1 = new PhoneDto();
+        phone1.setNumber("123456789");
+        phone1.setCitycode("221");
+        phone1.setContrycode("54");
+        List<PhoneDto> phones =new ArrayList<>();
+        phones.add(phone1);
+        userDto.setPhones(phones);
         UserDto returnUserDto = uService.addUser(userDto);
         return new ResponseEntity<>(returnUserDto, HttpStatus.CREATED);
     }
 
-    // DETAL
+    // DETAIL
     @RequestMapping(value = "api/user/{id}", method = RequestMethod.GET)
     public ResponseEntity<UserDto> detailUsers(@PathVariable String id){
         UserDto userDto = uService.getUser(id);
@@ -44,16 +53,6 @@ public class UserController {
         uService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    /*
-    // TODO ver q onda esto
-    @RequestMapping(value = "api/user", method = RequestMethod.GET)
-    public ResponseEntity<UserDto> getUserByParam(@RequestParam Optional<String> email){
-        UserDto userDto;
-        if(id.isPresent()){
-            userDto= uService.getUserById(id.get())
-        }
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
-    }*/
 
     // LIST
     @RequestMapping(value = "api/user", method = RequestMethod.GET)
@@ -79,7 +78,7 @@ public class UserController {
     @RequestMapping(value = "api/login", method = RequestMethod.POST)
     public ResponseEntity<JwtResponseDto> login(@Valid @RequestBody JwtRequestDto jwtRequestDto){
         JwtResponseDto response = uService.login(jwtRequestDto);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
