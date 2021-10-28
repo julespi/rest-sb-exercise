@@ -5,10 +5,8 @@ import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import java.io.Serializable;
 
-public class JwtRequestDto{
+public class JwtRequestDto {
 
 
     @NotBlank(message = "email is required")
@@ -22,12 +20,4 @@ public class JwtRequestDto{
     @Setter
     private String password;
 
-    /*public JwtRequest() {
-
-    }
-
-    public JwtRequest(String email, String password) {
-        this.setEmail(email);
-        this.setPassword(password);
-    }*/
 }

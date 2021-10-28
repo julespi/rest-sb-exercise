@@ -3,7 +3,6 @@ package com.julespi.restsbexercise.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 public class JwtResponseDto {

@@ -238,7 +238,6 @@ public class UserControllerTest {
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, tokenResponse.getStatusCode());
     }
 
-
     private HttpEntity<HttpHeaders> doLogin(String email) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

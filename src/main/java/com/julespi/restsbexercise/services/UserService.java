@@ -7,6 +7,7 @@ import com.julespi.restsbexercise.dto.UserDto;
 import com.julespi.restsbexercise.dto.JwtRequestDto;
 import com.julespi.restsbexercise.models.Phone;
 import com.julespi.restsbexercise.models.User;
+import com.julespi.restsbexercise.utils.DBException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,28 +27,24 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    /**
-     *
-     * @param userDto
-     * @return newUserDTo
-     */
+
     public UserDto addUser(UserDto userDto) {
+        log.info("[SERVICE] - ADDUSER called");
         User newUser = new User();
         mapUserDtoToUser(userDto, newUser);
         if (!isEmailAvailable(newUser.getEmail())) {
-            log.error("Email already taken:" + newUser.getEmail());
-            throw new RuntimeException("email already taken");
+            throw new DBException("email already taken");
         }
         newUser.setIsActive(true);
         newUser.updateLastLogin();
         User dbUser = userDaoImp.save(newUser);
-        log.info("User added to database");
         UserDto newUserDto = new UserDto();
         mapUserToUserDto(dbUser, newUserDto);
         return newUserDto;
     }
 
     public List<UserDto> listAllUsers() {
+        log.info("[SERVICE] - LISTALLUSERS called");
         List<User> allUsers = userDaoImp.list(User.class);
         List<UserDto> usersDto = new ArrayList<>();
         for (User user : allUsers) {
@@ -58,14 +55,16 @@ public class UserService {
         return usersDto;
     }
 
-    public UserDto getUser(String id) throws RuntimeException{
+    public UserDto getUser(String id) throws DBException{
+        log.info("[SERVICE] - GETUSER called");
         User dbUser = userDaoImp.findById(User.class, id);
         UserDto userDto = new UserDto();
         mapUserToUserDto(dbUser, userDto);
         return userDto;
     }
 
-    public UserDto updateUser(UserDto userDto, String id) throws RuntimeException {
+    public UserDto updateUser(UserDto userDto, String id) throws DBException {
+        log.info("[SERVICE] - UPDATEUSER called");
         User dbUser = userDaoImp.findById(User.class, id);
         mapUserDtoToUser(userDto, dbUser);
         userDaoImp.update(dbUser);
@@ -75,22 +74,22 @@ public class UserService {
     }
 
     public void deleteUser(String id) {
+        log.info("[SERVICE] - DELETEUSER called");
         User dbUser = userDaoImp.findById(User.class, id);
         dbUser.setIsActive(false);
         userDaoImp.update(dbUser);
     }
 
     public JwtResponseDto login(JwtRequestDto jwtRequestDto) {
+        log.info("[SERVICE] - LOGIN called");
         User dbUser = userDaoImp.findByEmail(jwtRequestDto.getEmail());
         if (dbUser == null || !passwordEncoder.matches(jwtRequestDto.getPassword(), dbUser.getPassword())) {
-            log.error("Invalid email or password");
-            throw new RuntimeException("invalid email or password");
+            throw new DBException("invalid email or password");
         }
         String token = getJWTToken(dbUser.getEmail());
         dbUser.setToken(token);
         dbUser.updateLastLogin();
         userDaoImp.update(dbUser);
-        log.info("User authenticated");
         JwtResponseDto response = new JwtResponseDto();
         response.setId(dbUser.getId());
         response.setToken(dbUser.getToken());

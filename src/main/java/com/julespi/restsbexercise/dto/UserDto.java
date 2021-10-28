@@ -11,16 +11,19 @@ import java.util.List;
 
 public class UserDto {
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String id;
 
     @NotBlank(message = "name is required")
-    @Getter @Setter
+    @Getter
+    @Setter
     private String name;
 
     @NotBlank(message = "email is required")
     @Email(message = "email is not valid")
-    @Getter @Setter
+    @Getter
+    @Setter
     private String email;
 
     @NotBlank(message = "password is required")
@@ -28,25 +31,31 @@ public class UserDto {
             regexp = "^(?=.*[A-Z])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{6,}$",
             message = "Password must contain at least one uppercase, three lowercase and two numbers"
     )
-    @Getter @Setter
+    @Getter
+    @Setter
     private String password;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Boolean isActive;
 
     @NotNull(message = "at least one phone is required")
     @Size(min = 1, message = "at least one phone is required")
     @Valid
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<PhoneDto> phones;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Date created;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Date modified;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Date last_login;
 
     public UserDto() {

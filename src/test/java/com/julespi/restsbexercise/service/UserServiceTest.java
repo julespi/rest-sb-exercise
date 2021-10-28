@@ -1,16 +1,12 @@
 package com.julespi.restsbexercise.service;
 
-import com.julespi.restsbexercise.dao.UserDaoImp;
 import com.julespi.restsbexercise.dto.JwtRequestDto;
 import com.julespi.restsbexercise.dto.JwtResponseDto;
 import com.julespi.restsbexercise.dto.PhoneDto;
 import com.julespi.restsbexercise.dto.UserDto;
-import com.julespi.restsbexercise.models.User;
 import com.julespi.restsbexercise.services.UserService;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -27,14 +23,13 @@ public class UserServiceTest {
     UserService userService;
 
 
-
-    private UserDto createUserDto(){
-        List<PhoneDto> phones =new ArrayList<>();
-        PhoneDto phone1 = new PhoneDto("123456789","221","54");
-        PhoneDto phone2 = new PhoneDto("987654321","11","55");
+    private UserDto createUserDto() {
+        List<PhoneDto> phones = new ArrayList<>();
+        PhoneDto phone1 = new PhoneDto("123456789", "221", "54");
+        PhoneDto phone2 = new PhoneDto("987654321", "11", "55");
         phones.add(phone1);
         phones.add(phone2);
-        UserDto newUserDto = new UserDto("User Julian Test","test@test.com","Password123");
+        UserDto newUserDto = new UserDto("User Julian Test", "test@test.com", "Password123");
         newUserDto.setPhones(phones);
         return newUserDto;
     }
@@ -69,8 +64,8 @@ public class UserServiceTest {
         List<UserDto> list = userService.listAllUsers();
         Assertions.assertFalse(list.isEmpty());
         Assertions.assertEquals(2, list.size());
-        Assertions.assertEquals(list.get(0).getId(),userDto.getId());
-        Assertions.assertEquals(list.get(1).getId(),userDtoTwo.getId());
+        Assertions.assertEquals(list.get(0).getId(), userDto.getId());
+        Assertions.assertEquals(list.get(1).getId(), userDtoTwo.getId());
     }
 
     @Test
@@ -78,7 +73,7 @@ public class UserServiceTest {
     public void testGetUser() {
         UserDto newUserDto = userService.addUser(createUserDto());
         UserDto persisteduserDto = userService.getUser(newUserDto.getId());
-        Assertions.assertEquals(newUserDto.getId(),persisteduserDto.getId());
+        Assertions.assertEquals(newUserDto.getId(), persisteduserDto.getId());
         Assertions.assertThrows(RuntimeException.class, () -> {
             userService.getUser("Test01");
         });
@@ -116,14 +111,13 @@ public class UserServiceTest {
         UserDto userDto = createUserDto();
         String nonEncodedPassword = userDto.getPassword();
         userService.addUser(userDto);
-
         JwtRequestDto request = new JwtRequestDto();
         request.setEmail(userDto.getEmail());
         request.setPassword(nonEncodedPassword);
         JwtResponseDto response = userService.login(request);
         String token = getJWTToken(userDto.getEmail());
-        Assertions.assertEquals(request.getEmail(),response.getEmail());
+        Assertions.assertEquals(request.getEmail(), response.getEmail());
         // TODO should verify that the token is valid. This is really tested in the controller layer
-        Assertions.assertEquals(response.getToken().length(),token.length());
+        Assertions.assertEquals(response.getToken().length(), token.length());
     }
 }

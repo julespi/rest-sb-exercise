@@ -5,21 +5,25 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 
-public class PhoneDto{
+public class PhoneDto {
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String id;
 
     @NotBlank(message = "phone number is required")
-    @Getter @Setter
+    @Getter
+    @Setter
     private String number;
 
     @NotBlank(message = "cityCode number is required")
-    @Getter @Setter
+    @Getter
+    @Setter
     private String citycode;
 
     @NotBlank(message = "countrycode number is required")
-    @Getter @Setter
+    @Getter
+    @Setter
     private String contrycode;
 
     public PhoneDto(String number, String citycode, String contrycode) {
