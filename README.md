@@ -3,34 +3,26 @@ El siguiente documento explica los pasos The following was discovered as part of
 
 1) *******ejecutar jar
 2) navegador y entrar a localhost:8080/h2-console y "Connect"
+![Image of docker-compose command with option up](https://github.com/julespi/rest-sb-exercise/blob/main/images/h2-console.png)
 3) Utilizando una aplicion que le permita realizar peticiones a una api como POSTMAN, INSOMNIA, etc. NOTA: Se encuentra disponible en ********* una coleccion JSON de peticiones para ser importada en POSTMAN. Caso contrario, mas abajo cuenta con la lista de endpoints a la API.
 4) **PARA UN CORRECTO FUNCIONAMIENTO DEBE REALIZAR LA EJECUCION DE localhost:8080/api/initdb**
-![Image of docker-compose command with option up](https://github.com/julespi/rest-sb-exercise/blob/master/images/init_db.png)
-5)
+![Image of docker-compose command with option up](https://github.com/julespi/rest-sb-exercise/blob/main/images/init_db.png)
+5) Una vez inicializada la base de datos, ejecutar un [POST] localhost:8080/login con las siguientes credenciales:
+```json
+{
+    "email":"julespi@gmail.com",
+    "password": "Password88"
+}
+```
+6) Una vez realizado esto, utilizar el Token devuelto en la response como el header **Authorization** y utilizarlo para el resto de la API
 
-* The original package name 'com.julespi.rest-sb-exercise' is invalid and this project uses 'com.julespi.restsbexercise' instead.
-
-# Getting Started
-
-### Reference Documentation
-For further reference, please consider the following sections:
-
-* [Official Gradle documentation](https://docs.gradle.org)
-* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/2.5.5/gradle-plugin/reference/html/)
-* [Create an OCI image](https://docs.spring.io/spring-boot/docs/2.5.5/gradle-plugin/reference/html/#build-image)
-* [Spring Web](https://docs.spring.io/spring-boot/docs/2.5.5/reference/htmlsingle/#boot-features-developing-web-applications)
-* [Spring Data JPA](https://docs.spring.io/spring-boot/docs/2.5.5/reference/htmlsingle/#boot-features-jpa-and-spring-data)
-
-### Guides
-The following guides illustrate how to use some features concretely:
-
-* [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
-* [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
-* [Building REST services with Spring](https://spring.io/guides/tutorials/bookmarks/)
-* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
-
-### Additional Links
-These additional references should also help you:
-
-* [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
-
+#DOCUMENTACION API
+| HTTP METHOD | URL                          | HEADER                              | BODY JSON                                                                                                                                                                                                                                                      |
+|-------------|------------------------------|-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| GET        | localhost:8080/api/initdb    |                                     |                                                                                                                                                                                                                                                                |
+| POST        | localhost:8080/api/login     |                                     | `{"email": "julespi@gmail.com", "password": "Password88"}`                                                                                                                                                                                                     |
+| GET         | localhost:8080/api/user/{id} | `{"Authorization": "Bearer token"}` |                                                                                                                                                                                                                                                                |
+| GET         | localhost:8080/api/user      | `{"Authorization": "Bearer token"}` |                                                                                                                                                                                                                                                                |
+| POST        | localhost:8080/api/user      | `{"Authorization": "Bearer token"}` | `{ "name": "Nombre Apellido", "email": "email@email.com", "password": "Contraseña12", "phones": [ { "number": "11111111", "citycode": "11", "contrycode": "57"},{"number": "22222222","citycode": "221","contrycode": "54"}]}`                                 |
+| PUT         | localhost:8080/api/user/{id} | `{"Authorization": "Bearer token"}` | `{"id": "402881eb7cc8ce41017cc8cef8140000","name": "Julian Spinelli","email": "julespi@gmail.com","password": "Password77","isActive": false,"phones": [{"id": "402881eb7cade4f2017cade58d600001","number": "11111111","citycode": "11","contrycode": "57"}]}` |
+| DELETE      | localhost:8080/api/user/{id} | `{"Authorization": "Bearer token"}` |                                                                                                                                                                                                                                                                |
