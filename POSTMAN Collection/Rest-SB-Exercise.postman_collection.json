@@ -1,0 +1,196 @@
+{
+	"info": {
+		"_postman_id": "62295038-76d7-4334-89ca-2f598d843d93",
+		"name": "Rest-SB-Exercise",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "listAllUsers()",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoianVsZXNwaUBnbWFpbC5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNjM1MzcyOTI4LCJleHAiOjE2MzUzNzM1Mjh9.JIOZN7rADak9HWqJH2gVAtZU_IHgSHYtwoz_Wxz7X_WwM4yYha5EZYpeq_b0b_cZo92eQKPSUOeHCCaP1ZTVew",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/user",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createUser(JSON)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoianVsZXNwaUBnbWFpbC5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNjM1NDYyNDY0LCJleHAiOjE2MzU0NjMwNjR9.WhOLtR8xAiLy2RUtnIsqzybAdNOALzKq-5h_imoJT7n0QsEnGtIMNRNbOCPYdV-gRo2xWjTMZ9y_KgRvyzePjA",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Otro Usuario\",\r\n    \"email\": \"otro@usuario.com\",\r\n    \"password\": \"Password32\",\r\n    \"phones\": [\r\n        {\r\n            \"number\": \"11111111\",\r\n            \"citycode\": \"11\",\r\n            \"contrycode\": \"57\"\r\n        },\r\n        {\r\n            \"number\": \"22222222\",\r\n            \"citycode\": \"221\",\r\n            \"contrycode\": \"54\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/user",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getUser()/id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoianVsZXNwaUBnbWFpbC5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNjM1MTA3NDg3LCJleHAiOjE2MzUxMDgwODd9.MBddmQDy1SkkFwRqDDSs8LW5hPRUqQ3ktyHkK8OW1_UDzmkSRCHLv7spTN4umXBYbHvTxwHMMWZTjrM0AmVMJA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/user/402881eb7cb2e65c017cb2e69f870000",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"user",
+						"402881eb7cb2e65c017cb2e69f870000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteUser()/id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/user/402881eb7cb23244017cb23365070003",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"user",
+						"402881eb7cb23244017cb23365070003"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateUser(JSON)/id",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoianVsZXNwaUBnbWFpbC5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNjM1NDU2NTk1LCJleHAiOjE2MzU0NTcxOTV9.Op6BzF8n5q8k2KZdbdgMy1nS1ZO_KVgrdH0aLfYKluJWpgSkb6G1z6uGjI1D8oSu5QfxhOLLIJjdkZmOqnWRTg",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"402881eb7cc8ce41017cc8cef8140000\",\r\n    \"name\": \"Julian Spinelli\",\r\n    \"email\": \"julespi@gmail.com\",\r\n    \"password\": \"Password77\",\r\n    \"isActive\": true,\r\n    \"phones\": [\r\n        {\r\n            \"id\": \"402881eb7cade4f2017cade58d600001\",\r\n            \"number\": \"11111111\",\r\n            \"citycode\": \"11\",\r\n            \"contrycode\": \"57\"\r\n        },\r\n        {\r\n            \"id\": \"402881eb7cade4f2017cade58d610002\",\r\n            \"number\": \"22222222\",\r\n            \"citycode\": \"221\",\r\n            \"contrycode\": \"54\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/user/402881eb7cc8ce41017cc8cef8140000",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"user",
+						"402881eb7cc8ce41017cc8cef8140000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login(JSON)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"julespi@gmail.com\",\r\n    \"password\": \"Password88\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "initDb()",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/initdb",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"initdb"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
